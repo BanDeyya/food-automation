@@ -1,0 +1,21 @@
+{
+  "name": "food-automation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "login": "node login.js",
+    "submit": "node submit.js",
+    "start": "node run.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dayjs": "^1.11.19",
+    "dotenv": "^17.3.1",
+    "playwright": "^1.58.2"
+  }
+}
