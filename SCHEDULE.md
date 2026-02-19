@@ -26,9 +26,11 @@ This will:
 - If expired: open the browser for you to log in, then run the form submit.
 - If valid: run the form submit only.
 
-## 2. Crontab setup (Mac M2 Pro)
+## 2. Crontab setup (Mac)
 
-Run at **2 PM IST, Monday–Friday**. (IST = UTC+5:30, so 2:00 PM IST = 8:30 AM UTC.)
+Run at **2 PM IST, Monday–Friday**.
+
+**Important:** On macOS, cron uses your **system’s local time**. So the cron time is whatever your Mac’s clock is set to (e.g. India = IST).
 
 ### Step 1: Get full path to `node`
 
@@ -56,22 +58,22 @@ crontab -e
 
 ### Step 3: Add the cron line
 
-Add **one line** (replace `PATH_TO_NODE` with the path from Step 1):
+Use **2 PM in your system time**. If your Mac is set to **India (IST)**, use `0 14` (14:00 = 2 PM):
 
 ```cron
-30 8 * * 1-5 cd /Users/priyanshubaranwal/personal-repo/food-automation && PATH_TO_NODE run.js
+0 14 * * 1-5 cd /Users/priyanshubaranwal/personal-repo/food-automation && PATH_TO_NODE run.js
 ```
 
-Example with Homebrew on M2:
+Example with Homebrew (Mac set to India):
 
 ```cron
-30 8 * * 1-5 cd /Users/priyanshubaranwal/personal-repo/food-automation && /opt/homebrew/bin/node run.js
+0 14 * * 1-5 cd /Users/priyanshubaranwal/personal-repo/food-automation && /opt/homebrew/bin/node run.js
 ```
 
-- `30 8` = 08:30 UTC = 2:00 PM IST  
+- `0 14` = 2:00 PM **local time** (so 2 PM IST when Mac is set to India)
 - `* * 1-5` = Monday (1) through Friday (5)
 
-Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
+Replace `PATH_TO_NODE` with the path from Step 1 (e.g. `/opt/homebrew/bin/node`). Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
 
 ### Step 4: Confirm it’s installed
 

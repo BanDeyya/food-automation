@@ -108,7 +108,7 @@ If it’s outside 2–6 PM IST or already submitted today, it will say so and ex
 
 ## 7. Schedule daily run at 2 PM IST (Mon–Fri) with cron
 
-Cron runs the script at **2:00 PM IST, Monday–Friday**. You need the **full path** to the project and to `node`.
+Cron runs the script at **2:00 PM IST, Monday–Friday**. On macOS, cron uses your **system’s local time**, so use 2 PM in that time (e.g. `0 14` when your Mac is set to India). You need the **full path** to the project and to `node`.
 
 **7.1 – Get paths**
 
@@ -135,14 +135,16 @@ Add this single line, then replace:
 - `FULL_PATH_TO_PROJECT` → output of `pwd` (e.g. `/Users/yourname/food-automation`)
 - `FULL_PATH_TO_NODE` → output of `which node` (e.g. `/opt/homebrew/bin/node`)
 
+Use **2 PM local time** (if Mac is set to India, that’s 14:00):
+
 ```cron
-30 8 * * 1-5 cd FULL_PATH_TO_PROJECT && FULL_PATH_TO_NODE run.js
+0 14 * * 1-5 cd FULL_PATH_TO_PROJECT && FULL_PATH_TO_NODE run.js
 ```
 
 Example (yours will differ):
 
 ```cron
-30 8 * * 1-5 cd /Users/yourname/food-automation && /opt/homebrew/bin/node run.js
+0 14 * * 1-5 cd /Users/yourname/food-automation && /opt/homebrew/bin/node run.js
 ```
 
 Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
@@ -224,7 +226,7 @@ pnpm start
 
 # Cron (after: pwd + which node)
 crontab -e
-# Add: 30 8 * * 1-5 cd /Users/YOUR_USERNAME/food-automation && /path/from/which/node run.js
+# Add: 0 14 * * 1-5 cd /Users/YOUR_USERNAME/food-automation && /path/from/which/node run.js
 
 # Optional catch-up agent
 cp /Users/YOUR_USERNAME/food-automation/com.food-automation.catchup.plist ~/Library/LaunchAgents/
