@@ -2,6 +2,8 @@ require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 
 const { chromium } = require("playwright");
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+dayjs.extend(utc);
 const fs = require("fs");
 const path = require("path");
 

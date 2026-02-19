@@ -6,6 +6,8 @@ const { spawnSync } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+dayjs.extend(utc);
 
 const IST_OFFSET_MINUTES = 5 * 60 + 30; // 5:30
 const STATE_FILE = path.join(__dirname, "lastSubmission.json");
