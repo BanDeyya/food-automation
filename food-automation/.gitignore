@@ -1,8 +1,0 @@
-node_modules/
-.env
-auth.json
-lastSubmission.json
-*.log
-catchup.log
-catchup.err.log
-.DS_Store
