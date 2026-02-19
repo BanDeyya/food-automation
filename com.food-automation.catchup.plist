@@ -6,16 +6,16 @@
   <string>com.food-automation.catchup</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/opt/homebrew/bin/node</string>
-    <string>/Users/priyanshubaranwal/personal-repo/food-automation/catchUp.js</string>
+    <string>NODE_PATH_PLACEHOLDER</string>
+    <string>PROJECT_PATH_PLACEHOLDER/catchUp.js</string>
   </array>
   <key>WorkingDirectory</key>
-  <string>/Users/priyanshubaranwal/personal-repo/food-automation</string>
+  <string>PROJECT_PATH_PLACEHOLDER</string>
   <key>RunAtLoad</key>
   <true/>
   <key>StandardOutPath</key>
-  <string>/Users/priyanshubaranwal/personal-repo/food-automation/catchup.log</string>
+  <string>PROJECT_PATH_PLACEHOLDER/catchup.log</string>
   <key>StandardErrorPath</key>
-  <string>/Users/priyanshubaranwal/personal-repo/food-automation/catchup.err.log</string>
+  <string>PROJECT_PATH_PLACEHOLDER/catchup.err.log</string>
 </dict>
 </plist>

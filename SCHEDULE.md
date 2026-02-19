@@ -6,6 +6,7 @@ Use **cron** on your Mac to run the script automatically.
 
 Sensitive config (form URLs, email) lives in **`.env`** in the project root. Copy from `.env.example` and fill in:
 
+- `PROJECT_PATH` – Full path to this project (e.g. output of `pwd` when inside the project). Use this same path in your crontab and plist.
 - `LOGIN_FORM_URL` – Google form URL used for login
 - `SUBMIT_FORM_URL` – Food submission form URL
 - `USER_EMAIL` – Your email (for the “Record …” checkbox)
@@ -58,22 +59,22 @@ crontab -e
 
 ### Step 3: Add the cron line
 
-Use **2 PM in your system time**. If your Mac is set to **India (IST)**, use `0 14` (14:00 = 2 PM):
+Use **2 PM in your system time**. If your Mac is set to **India (IST)**, use `0 14` (14:00 = 2 PM). Use your **PROJECT_PATH** from `.env` and the path from Step 1 for `node`:
 
 ```cron
-0 14 * * 1-5 cd /Users/priyanshubaranwal/personal-repo/food-automation && PATH_TO_NODE run.js
+0 14 * * 1-5 cd PROJECT_PATH_FROM_ENV && PATH_TO_NODE run.js
 ```
 
-Example with Homebrew (Mac set to India):
+Example (Mac set to India; replace with your PROJECT_PATH and node path):
 
 ```cron
-0 14 * * 1-5 cd /Users/priyanshubaranwal/personal-repo/food-automation && /opt/homebrew/bin/node run.js
+0 14 * * 1-5 cd /Users/yourname/food-automation && /opt/homebrew/bin/node run.js
 ```
 
 - `0 14` = 2:00 PM **local time** (so 2 PM IST when Mac is set to India)
 - `* * 1-5` = Monday (1) through Friday (5)
 
-Replace `PATH_TO_NODE` with the path from Step 1 (e.g. `/opt/homebrew/bin/node`). Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
+Replace `PROJECT_PATH_FROM_ENV` with the value of `PROJECT_PATH` in your `.env`, and `PATH_TO_NODE` with the path from Step 1. Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
 
 ### Step 4: Confirm it’s installed
 

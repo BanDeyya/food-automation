@@ -73,6 +73,7 @@ open -e .env
 
 Set at least:
 
+- `PROJECT_PATH` – Full path to this project (e.g. output of `pwd` when you’re in the project folder). You’ll use this same path when setting up cron and the Launch Agent plist.
 - `LOGIN_FORM_URL` – Google form URL where you sign in (same form as the one you’ll submit).
 - `SUBMIT_FORM_URL` – Full URL of the food submission form (e.g. `https://docs.google.com/forms/d/e/.../viewform`).
 - `USER_EMAIL` – Your email (must match the “Record your@email.com” option in the form).
@@ -132,7 +133,7 @@ Pick an editor if asked (e.g. nano).
 
 Add this single line, then replace:
 
-- `FULL_PATH_TO_PROJECT` → output of `pwd` (e.g. `/Users/yourname/food-automation`)
+- `FULL_PATH_TO_PROJECT` → value of `PROJECT_PATH` in your `.env` (or output of `pwd` when in the project)
 - `FULL_PATH_TO_NODE` → output of `which node` (e.g. `/opt/homebrew/bin/node`)
 
 Use **2 PM local time** (if Mac is set to India, that’s 14:00):
@@ -166,10 +167,10 @@ If the Mac was **asleep at 2 PM**, cron won’t run. You can run a small “catc
 **8.1 – Copy the plist into LaunchAgents**
 
 ```bash
-cp /FULL_PATH_TO_PROJECT/com.food-automation.catchup.plist ~/Library/LaunchAgents/
+cp FULL_PATH_TO_PROJECT/com.food-automation.catchup.plist ~/Library/LaunchAgents/
 ```
 
-Use the same full project path as in step 7 (e.g. `/Users/yourname/food-automation`).
+Use your `PROJECT_PATH` from `.env` (or the full path to the project).
 
 **8.2 – Edit the plist with your paths**
 
@@ -179,8 +180,8 @@ nano ~/Library/LaunchAgents/com.food-automation.catchup.plist
 
 Replace:
 
-- Every `/Users/priyanshubaranwal/personal-repo/food-automation` with **your** full project path.
-- `/opt/homebrew/bin/node` with the output of `which node` (if different on your Mac).
+- Every `PROJECT_PATH_PLACEHOLDER` with your **PROJECT_PATH** from `.env` (full path to the project).
+- `NODE_PATH_PLACEHOLDER` with the output of `which node` (e.g. `/opt/homebrew/bin/node`).
 
 Save and exit.
 
@@ -216,7 +217,7 @@ npx playwright install chromium
 # Config
 cp .env.example .env
 nano .env
-# (fill LOGIN_FORM_URL, SUBMIT_FORM_URL, USER_EMAIL, FOOD_CHOICE)
+# (fill PROJECT_PATH, LOGIN_FORM_URL, SUBMIT_FORM_URL, USER_EMAIL, FOOD_CHOICE)
 
 # First-time login
 pnpm run login
