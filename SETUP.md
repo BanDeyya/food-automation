@@ -136,16 +136,16 @@ Add this single line, then replace:
 - `FULL_PATH_TO_PROJECT` → value of `PROJECT_PATH` in your `.env` (or output of `pwd` when in the project)
 - `FULL_PATH_TO_NODE` → output of `which node` (e.g. `/opt/homebrew/bin/node`)
 
-Use **2 PM local time** (if Mac is set to India, that’s 14:00):
+Runs **every 30 minutes** between 2 PM and 6 PM (so if 2 PM was missed, it retries at 2:30, 3:00, etc.):
 
 ```cron
-0 14 * * 1-5 cd FULL_PATH_TO_PROJECT && FULL_PATH_TO_NODE run.js
+0,30 14-17 * * 1-5 cd FULL_PATH_TO_PROJECT && FULL_PATH_TO_NODE run.js
 ```
 
 Example (yours will differ):
 
 ```cron
-0 14 * * 1-5 cd /Users/yourname/food-automation && /opt/homebrew/bin/node run.js
+0,30 14-17 * * 1-5 cd /Users/yourname/food-automation && /opt/homebrew/bin/node run.js
 ```
 
 Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
@@ -156,7 +156,7 @@ Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
 crontab -l
 ```
 
-You should see your line. The job will run at 2 PM IST on weekdays when the Mac is on (and ideally awake).
+You should see your line. The job runs every 30 minutes between 2 PM and 6 PM on weekdays when the Mac is on (and ideally awake).
 
 ---
 
@@ -227,7 +227,7 @@ pnpm start
 
 # Cron (after: pwd + which node)
 crontab -e
-# Add: 0 14 * * 1-5 cd /Users/YOUR_USERNAME/food-automation && /path/from/which/node run.js
+# Add: 0,30 14-17 * * 1-5 cd /Users/YOUR_USERNAME/food-automation && /path/from/which/node run.js
 
 # Optional catch-up agent
 cp /Users/YOUR_USERNAME/food-automation/com.food-automation.catchup.plist ~/Library/LaunchAgents/

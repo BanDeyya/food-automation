@@ -59,20 +59,22 @@ crontab -e
 
 ### Step 3: Add the cron line
 
-Use **2 PM in your system time**. If your Mac is set to **India (IST)**, use `0 14` (14:00 = 2 PM). Use your **PROJECT_PATH** from `.env` and the path from Step 1 for `node`:
+The job runs **every 30 minutes** between 2 PM and 6 PM (Mon–Fri). If the 2 PM run was missed (e.g. Mac was asleep), the next run at 2:30, 3:00, … will try. Once submitted for the day, later runs exit without re-submitting.
+
+Use your **PROJECT_PATH** from `.env` and the path from Step 1 for `node`:
 
 ```cron
-0 14 * * 1-5 cd PROJECT_PATH_FROM_ENV && PATH_TO_NODE run.js
+0,30 14-17 * * 1-5 cd PROJECT_PATH_FROM_ENV && PATH_TO_NODE run.js
 ```
 
 Example (Mac set to India; replace with your PROJECT_PATH and node path):
 
 ```cron
-0 14 * * 1-5 cd /Users/yourname/food-automation && /opt/homebrew/bin/node run.js
+0,30 14-17 * * 1-5 cd /Users/yourname/food-automation && /opt/homebrew/bin/node run.js
 ```
 
-- `0 14` = 2:00 PM **local time** (so 2 PM IST when Mac is set to India)
-- `* * 1-5` = Monday (1) through Friday (5)
+- `0,30 14-17` = at :00 and :30 past the hour, for hours 14–17 (2 PM, 2:30 PM, 3 PM, 3:30 PM, 4 PM, 4:30 PM, 5 PM, 5:30 PM) **local time**
+- `* * 1-5` = Monday through Friday
 
 Replace `PROJECT_PATH_FROM_ENV` with the value of `PROJECT_PATH` in your `.env`, and `PATH_TO_NODE` with the path from Step 1. Save and exit (nano: Ctrl+O, Enter, Ctrl+X).
 
@@ -82,7 +84,7 @@ Replace `PROJECT_PATH_FROM_ENV` with the value of `PROJECT_PATH` in your `.env`,
 crontab -l
 ```
 
-You should see your line. Cron will run it at 2 PM IST on weekdays as long as the Mac is on (and preferably awake) at that time.
+You should see your line. Cron will run it every 30 minutes between 2 PM and 6 PM IST on weekdays whenever the Mac is on (and preferably awake).
 
 ## 3. Important for cron
 
