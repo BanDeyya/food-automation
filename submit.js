@@ -8,7 +8,7 @@ const fs = require("fs");
 const path = require("path");
 
 const STATE_FILE = path.join(__dirname, "lastSubmission.json");
-const AUTH_FILE = path.join(__dirname, "auth.json");
+const BROWSER_DATA_DIR = path.join(__dirname, "browser-data");
 const SUBMIT_FORM_URL = process.env.SUBMIT_FORM_URL;
 const USER_EMAIL = process.env.USER_EMAIL;
 const FOOD_CHOICE = process.env.FOOD_CHOICE || "Nonveg";
@@ -54,52 +54,67 @@ async function submitForm() {
     return;
   }
 
-  const browser = await chromium.launch({ headless: false, slowMo: 600 });
-  const context = await browser.newContext({
-    storageState: AUTH_FILE,
-  });
-
   if (!SUBMIT_FORM_URL || !USER_EMAIL) {
     console.error("Missing SUBMIT_FORM_URL or USER_EMAIL in .env");
     return;
   }
 
-  const page = await context.newPage();
-  await page.goto(SUBMIT_FORM_URL);
+  const context = await chromium.launchPersistentContext(BROWSER_DATA_DIR, {
+    headless: false,
+    slowMo: 600,
+  });
 
-  // checkbox – match "Record your@email.com" (escape special regex chars in email)
-  const emailPattern = new RegExp(
-    "Record " + USER_EMAIL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-    "i",
-  );
-  const checkbox = page.getByRole("checkbox", { name: emailPattern });
+  try {
+    const page = context.pages()[0] || (await context.newPage());
+    await page.goto(SUBMIT_FORM_URL);
 
-  await checkbox.click();
+    const emailPattern = new RegExp(
+      "Record " + USER_EMAIL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "i",
+    );
 
-  // open dropdown
-  const dropdown = page.getByRole("listbox");
-  await dropdown.click();
+    // Wait for the form checkbox — if it doesn't appear, session likely expired
+    const formLoaded = await page
+      .getByRole("checkbox", { name: emailPattern })
+      .waitFor({ state: "visible", timeout: 15000 })
+      .then(() => true)
+      .catch(() => false);
 
-  // wait for Yes option to be visible
-  const yesOption = page.getByRole("option", { name: "Yes" });
-  await yesOption.waitFor({ state: "visible" });
+    if (!formLoaded) {
+      console.error(
+        "Form did not load — session may have expired. Re-login needed.",
+      );
+      process.exit(2);
+    }
 
-  // click Yes
-  await yesOption.click();
+    // checkbox
+    await page.getByRole("checkbox", { name: emailPattern }).click();
 
-  // radio
-  await page.getByRole("radio", { name: FOOD_CHOICE }).click();
+    // open dropdown
+    const dropdown = page.getByRole("listbox");
+    await dropdown.click();
 
-  // submit
-  await page.getByRole("button", { name: /submit/i }).click();
+    // wait for Yes option to be visible
+    const yesOption = page.getByRole("option", { name: "Yes" });
+    await yesOption.waitFor({ state: "visible" });
 
-  // wait for confirmation
-  await page.getByText(/response has been recorded/i).waitFor();
+    // click Yes
+    await yesOption.click();
 
-  markSubmitted();
+    // radio
+    await page.getByRole("radio", { name: FOOD_CHOICE }).click();
 
-  await browser.close();
-  console.log("Form submitted successfully.");
+    // submit
+    await page.getByRole("button", { name: /submit/i }).click();
+
+    // wait for confirmation
+    await page.getByText(/response has been recorded/i).waitFor();
+
+    markSubmitted();
+    console.log("Form submitted successfully.");
+  } finally {
+    await context.close();
+  }
 }
 
 submitForm();

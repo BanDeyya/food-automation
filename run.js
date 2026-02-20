@@ -12,18 +12,30 @@ function runScript(scriptPath) {
     stdio: "inherit",
     cwd: __dirname,
   });
-  if (r.status !== 0) {
-    process.exit(r.status ?? 1);
-  }
+  return r.status ?? 1;
 }
 
 (function main() {
   if (!isAuthValid()) {
-    console.log("Google login expired or missing. Opening browser for you to log in...");
-    runScript(LOGIN_SCRIPT);
-    console.log("Login finished. Running submit form...");
+    console.log(
+      "No login session found. Opening browser for you to log in...",
+    );
+    const loginStatus = runScript(LOGIN_SCRIPT);
+    if (loginStatus !== 0) process.exit(loginStatus);
   }
 
   console.log("Running submit form...");
-  runScript(SUBMIT_SCRIPT);
+  const submitStatus = runScript(SUBMIT_SCRIPT);
+
+  if (submitStatus === 2) {
+    console.log("Session expired. Opening browser for you to log in...");
+    const loginStatus = runScript(LOGIN_SCRIPT);
+    if (loginStatus !== 0) process.exit(loginStatus);
+
+    console.log("Retrying submission...");
+    const retryStatus = runScript(SUBMIT_SCRIPT);
+    if (retryStatus !== 0) process.exit(retryStatus);
+  } else if (submitStatus !== 0) {
+    process.exit(submitStatus);
+  }
 })();

@@ -1,6 +1,7 @@
 node_modules/
 .env
 auth.json
+browser-data/
 lastSubmission.json
 *.log
 catchup.log
