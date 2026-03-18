@@ -36,7 +36,7 @@ else
 fi
 
 # 5. Add crontab entry
-CRON_JOB="0 14 * * 1-5 cd $PROJECT_DIR && $NODE_BIN run.js >> $PROJECT_DIR/cron.log 2>&1"
+CRON_JOB="*/10 12-18 * * 1-5 cd $PROJECT_DIR && $NODE_BIN run.js >> $PROJECT_DIR/cron.log 2>&1"
 
 echo "📅 Updating crontab..."
 # Remove any existing crontab entries for this project (both the old run_form_once.sh and the new run.js ones)

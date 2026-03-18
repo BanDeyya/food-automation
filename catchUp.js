@@ -30,9 +30,13 @@ function shouldRunCatchUp() {
   const now = nowIST();
   const weekday = now.day(); // 0 Sun, 1 Mon, ..., 5 Fri, 6 Sat
   const hour = now.hour();
+  const minute = now.minute();
 
   if (weekday === 0 || weekday === 6) return false; // weekend
-  if (hour < 14 || hour >= 18) return false; // outside 2 PM–6 PM IST
+  // Only allow 12:30 PM–6:30 PM IST
+  const beforeStart = hour < 12 || (hour === 12 && minute < 30);
+  const afterEnd = hour > 18 || (hour === 18 && minute > 30);
+  if (beforeStart || afterEnd) return false;
   if (alreadySubmittedToday()) return false;
 
   return true;
