@@ -50,7 +50,7 @@ async function submitForm() {
   const today = nowIST().format("YYYY-MM-DD");
 
   if (alreadySubmittedToday()) {
-    await notify(`Skipped — already submitted today (${today})`);
+    // await notify(`Skipped — already submitted today (${today})`);
     console.log(`${COLORS.info}Already submitted today.${COLORS.reset}`);
     return;
   }
