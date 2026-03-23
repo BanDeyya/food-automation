@@ -26,24 +26,37 @@ function nowIST() {
   return dayjs().utcOffset(IST_OFFSET_MINUTES);
 }
 
-function alreadySubmittedToday() {
-  if (!fs.existsSync(STATE_FILE)) return false;
-
+function getState() {
+  if (!fs.existsSync(STATE_FILE)) return {};
   try {
     const raw = fs.readFileSync(STATE_FILE, "utf8").trim();
-    if (!raw) return false;
-    const data = JSON.parse(raw);
-    return data.date === nowIST().format("YYYY-MM-DD");
+    return raw ? JSON.parse(raw) : {};
   } catch {
-    return false;
+    return {};
   }
 }
 
+function updateState(updates) {
+  const data = { ...getState(), ...updates };
+  fs.writeFileSync(STATE_FILE, JSON.stringify(data));
+}
+
+function alreadySubmittedToday() {
+  const data = getState();
+  return data.date === nowIST().format("YYYY-MM-DD");
+}
+
+function alreadyDeadlineNotifiedToday() {
+  const data = getState();
+  return data.deadlineNotified === nowIST().format("YYYY-MM-DD");
+}
+
 function markSubmitted() {
-  fs.writeFileSync(
-    STATE_FILE,
-    JSON.stringify({ date: nowIST().format("YYYY-MM-DD") }),
-  );
+  updateState({ date: nowIST().format("YYYY-MM-DD") });
+}
+
+function markDeadlineNotified() {
+  updateState({ deadlineNotified: nowIST().format("YYYY-MM-DD") });
 }
 
 async function submitForm() {
@@ -58,6 +71,20 @@ async function submitForm() {
   const now = nowIST();
   const hour = now.hour();
   const minute = now.minute();
+
+  // Deadline check (5:30 PM IST)
+  const isAfterDeadline = hour > 17 || (hour === 17 && minute >= 30);
+  if (isAfterDeadline) {
+    if (!alreadyDeadlineNotifiedToday()) {
+      console.log(`${COLORS.info}[notify] Sending manual-intervention notification...${COLORS.reset}`);
+      await notify(`Please fill on your own — manual intervention needed (after 5:30 PM on ${today})`);
+      markDeadlineNotified();
+      console.log(`${COLORS.info}[notify] Manual-intervention notification sent.${COLORS.reset}`);
+    } else {
+      console.log(`${COLORS.info}After 5:30 PM deadline and already notified.${COLORS.reset}`);
+    }
+    return;
+  }
 
   // Only allow 12:30 PM–6:30 PM IST
   const beforeStart = hour < 12 || (hour === 12 && minute < 30);
