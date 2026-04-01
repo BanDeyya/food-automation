@@ -22,6 +22,48 @@ const COLORS = {
   reset: "\x1b[0m",
 };
 
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function waitForFormCheckbox(page, emailPattern) {
+  // Fast path: if already logged in, checkbox appears quickly.
+  const checkbox = page.getByRole("checkbox", { name: emailPattern });
+  const fast = await checkbox
+    .waitFor({ state: "visible", timeout: 15000 })
+    .then(() => true)
+    .catch(() => false);
+  if (fast) return true;
+
+  // Slow path: if we got redirected to Google sign-in, give time to complete login.
+  const url = page.url();
+  const looksLikeSignIn =
+    url.includes("accounts.google.com") ||
+    (await page
+      .getByText(/sign in/i)
+      .first()
+      .isVisible()
+      .catch(() => false));
+
+  if (!looksLikeSignIn) return false;
+
+  console.log(
+    `${COLORS.info}Sign-in detected. Waiting up to 2 minutes for login...${COLORS.reset}`,
+  );
+
+  const deadline = Date.now() + 2 * 60 * 1000;
+  while (Date.now() < deadline) {
+    const ok = await checkbox
+      .waitFor({ state: "visible", timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if (ok) return true;
+    await sleep(1000);
+  }
+
+  return false;
+}
+
 function nowIST() {
   return dayjs().utcOffset(IST_OFFSET_MINUTES);
 }
@@ -121,12 +163,8 @@ async function submitForm() {
       "i",
     );
 
-    // Wait for the form checkbox — if it doesn't appear, session likely expired
-    const formLoaded = await page
-      .getByRole("checkbox", { name: emailPattern })
-      .waitFor({ state: "visible", timeout: 15000 })
-      .then(() => true)
-      .catch(() => false);
+    // Wait for the form checkbox — fast when logged in; longer if sign-in page shows up.
+    const formLoaded = await waitForFormCheckbox(page, emailPattern);
 
     if (!formLoaded) {
       console.log(
